@@ -1,0 +1,7 @@
+HTTP/1.1 500 
+vary: accept-encoding
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Tue, 22 Mar 2022 16:41:53 GMT
+Connection: close
+

@@ -1,0 +1,8 @@
+#main
+spring:
+   jpa:
+      show-sql: "true"
+
+#Server
+server:
+  port: 8080

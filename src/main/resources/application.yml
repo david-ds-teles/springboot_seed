@@ -1,0 +1,72 @@
+#main
+spring:
+   profiles:
+    active: "@env@"
+    
+   messages:
+    encoding: UTF-8
+    basename: lang/messages
+   
+   datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: root
+      password: seed
+      url: jdbc:mysql://localhost:3306/spring
+
+   jpa:
+      show-sql: "false"
+      open-in-view: false
+      hibernate:
+          enable_lazy_load_no_trans: true
+          jdbc.lob.non_contextual_creation: true
+          format_sql: true
+          id.new_generator_mappings: false
+          naming.implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+          naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+   main:
+      lazy-initialization: true
+      
+   servlet:
+      multipart:
+         enabled: "true"
+         file-size-threshold: 2MB
+         max-file-size: 5MB
+         max-request-size: 10MB
+
+   jackson:
+      time-zone: "UTC"
+      serialization:
+         write-dates-as-timestamps: false
+
+#Server
+server:
+  port: 5001
+  servlet:
+    encoding.charset: UTF-8
+    encoding.force: true
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,application/json
+    
+  error.whitelabel.enabled: true
+  tomcat:
+    connection-timeout: 10000
+
+#Logger
+logging:
+  level:
+      root: INFO
+      
+viacep:
+  url: https://viacep.com.br/ws
+#Actuator config
+management:
+#   endpoint:
+#      health: 
+#        roles: "ROLE_ADMIN"
+#        show-details: "WHEN_AUTHORIZED"
+  
+   endpoints:
+      web:
+       base-path: /monitor
