@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -48,9 +49,13 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 
 	@ExceptionHandler(MyExceptionError.class)
 	public ResponseEntity<ErrorResponse> myExceptionHandler(MyExceptionError ex) {
-		log.error("default throwable error handler", ex);
+		log.info("default throwable error handler");
 
-		ErrorResponse rsp = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+		String message = extractMessageKeyValue(ex);
+
+		log.error(message, ex);
+
+		ErrorResponse rsp = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(rsp);
 	}
 
@@ -78,7 +83,25 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 			HttpStatus.BAD_REQUEST.value(),
 			messages.getMessage("body_not_provided")
 		);
-		return ResponseEntity.internalServerError().body(rsp);
+
+		return ResponseEntity.badRequest().body(rsp);
+	}
+
+	@Override
+	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+		HttpRequestMethodNotSupportedException ex,
+		HttpHeaders headers,
+		HttpStatus status,
+		WebRequest request
+	) {
+		log.error("default handleHttpRequestMethodNotSupported handler", ex);
+
+		ErrorResponse rsp = new ErrorResponse(
+			HttpStatus.BAD_REQUEST.value(),
+			messages.getMessage("http_method_not_supported")
+		);
+
+		return ResponseEntity.badRequest().body(rsp);
 	}
 
 	@Override
@@ -96,6 +119,16 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 			messages.getMessage("internal_server_error")
 		);
 		return ResponseEntity.internalServerError().body(rsp);
+	}
+
+	private String extractMessageKeyValue(MyExceptionError ex) {
+		String message = ex.getMessage();
+
+		if (ex.getMessageKey() != null) {
+			message = messages.getMessage(ex.getMessageKey(), ex.getMessageArgs());
+		}
+
+		return message;
 	}
 
 	@JsonInclude(Include.NON_NULL)

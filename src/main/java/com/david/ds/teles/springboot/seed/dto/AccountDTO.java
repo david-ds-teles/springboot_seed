@@ -20,15 +20,21 @@ public class AccountDTO implements EntityConverter<Account> {
 	private String provider;
 
 	public AccountDTO(Account account) {
-		this.convert(account);
+		this.fromEntity(account);
 	}
 
 	@Override
-	public void convert(Account entity) {
+	public void fromEntity(Account entity) {
 		if (entity == null) return;
 
 		this.id = entity.getId();
 		this.email = entity.getEmail();
 		this.provider = entity.getProvider();
+	}
+
+	@Override
+	public Account toEntity() {
+		Account account = new Account(this.id, this.email, this.provider, null);
+		return account;
 	}
 }
