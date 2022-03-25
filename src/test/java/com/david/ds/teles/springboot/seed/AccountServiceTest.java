@@ -27,10 +27,9 @@ public class AccountServiceTest {
 
 	@InjectMocks
 	AccountService service;
-
-	@Test
-	void should_given_error_for_invalid_data() {
-		System.out.println(message.getMessage("invalid_params"));
-		service.create(null);
-	}
+	//	@Test
+	//	void should_given_error_for_invalid_data() {
+	//		System.out.println(message.getMessage("invalid_params"));
+	//		service.create(null);
+	//	}
 }
