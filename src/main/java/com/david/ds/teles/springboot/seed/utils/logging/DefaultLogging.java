@@ -16,19 +16,21 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class DefaultLogging {
+
 	private Logger log = LoggerFactory.getLogger(DefaultLogging.class);
 
-	@Around("within(@DefaultLogging.LogOperation *) || @annotation(DefaultLogging.LogOperation)")
+	@Around(
+		"within(@DefaultLogging.LogOperation *) || @annotation(DefaultLogging.LogOperation)"
+	)
 	public Object log(ProceedingJoinPoint point) throws Throwable {
-		try {
-			log.info("starting {}", point.getSignature());
-			Object result = point.proceed();
-			log.info("ending {} -> with result: {}", point.getSignature(), result.toString());
-			return result;
-		} catch (Exception e) {
-			log.error("failed to {} \n[ERROR] ", point.toString(), e);
-			throw e;
-		}
+		log.info("starting {}", point.getSignature());
+		Object result = point.proceed();
+		log.info(
+			"ending {} -> with result: {}",
+			point.getSignature(),
+			result != null ? result.toString() : ""
+		);
+		return result;
 	}
 
 	@Retention(RUNTIME)

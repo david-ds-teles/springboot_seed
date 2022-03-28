@@ -9,14 +9,19 @@
 		<version>2.6.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.david.ds.teles</groupId>
 	<artifactId>springboot-seed</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>springboot-seed</name>
 	<description>a springboot seed projet</description>
+
 	<properties>
 		<java.version>11</java.version>
+		<testcontainers.version>1.16.2</testcontainers.version>
+		<prettier.plugin.version>0.16</prettier.plugin.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -63,7 +68,34 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mysql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<profiles>
 		<profile>
@@ -113,23 +145,35 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			
+
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<!-->plugin to enforce code style to keep things neat</ -->
 				<plugin>
 					<groupId>com.hubspot.maven.plugins</groupId>
 					<artifactId>prettier-maven-plugin</artifactId>
-					<version>0.7</version>
+					<version>${prettier.plugin.version}</version>
 					<configuration>
+						<prettierJavaVersion>1.5.0</prettierJavaVersion>
 						<printWidth>100</printWidth>
 						<tabWidth>2</tabWidth>
 						<useTabs>true</useTabs>
+						<printWidth>90</printWidth>
+						<tabWidth>2</tabWidth>
 						<ignoreConfigFile>true</ignoreConfigFile>
 						<ignoreEditorConfig>true</ignoreEditorConfig>
+
+						<!-- Use <inputGlobs> to override the default input patterns -->
+						<inputGlobs>
+							<!-- These are the default patterns, you can omit <inputGlobs> entirely 
+								unless you want to override them -->
+							<inputGlob>src/main/java/**/*.java</inputGlob>
+							<inputGlob>src/test/java/**/*.java</inputGlob>
+						</inputGlobs>
 					</configuration>
+
 					<executions>
 						<execution>
 							<phase>validate</phase>

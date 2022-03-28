@@ -1,7 +1,6 @@
 package com.david.ds.teles.springboot.seed.core.domain;
 
 import com.david.ds.teles.springboot.seed.utils.exceptions.MyExceptionError;
-import com.david.ds.teles.springboot.seed.utils.i18n.AppMessage;
 import com.david.ds.teles.springboot.seed.utils.validator.MyValidatorGroups;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -27,8 +26,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
-//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Account {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -44,22 +43,40 @@ public class Account {
 	@PastOrPresent(groups = { MyValidatorGroups.Update.class })
 	private OffsetDateTime updatedAt;
 
-	public void create(AppMessage messages) {
+	public Account(Long id) {
+		this.id = id;
+	}
+
+	public void checkIdValidty() {
+		if (this.id == null || this.id <= 0) throw new MyExceptionError(
+			"id invalid for account",
+			"invalid_params",
+			null
+		);
+	}
+
+	public void checkCreateParams() {
 		if (this.email == null) throw new MyExceptionError(
-			messages.getMessage("invalid_email", new Object[] { email })
+			"email invalid for account",
+			"invalid_email",
+			new Object[] { email }
 		);
 
 		Pattern p = Pattern.compile("^.+@foo\\.com");
 		Matcher m = p.matcher(this.email);
 
 		if (m.matches()) throw new MyExceptionError(
-			messages.getMessage("invalid_email", new Object[] { email })
+			"email invalid for account",
+			"invalid_email",
+			new Object[] { email }
 		);
 	}
 
-	public void update(AppMessage messages) {
+	public void checkUpdateParams() {
 		if (this.id == null || id <= 0) throw new MyExceptionError(
-			messages.getMessage("invalid_params")
+			"update invalid for account",
+			"invalid_params",
+			null
 		);
 	}
 }

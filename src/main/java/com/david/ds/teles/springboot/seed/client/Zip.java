@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class Zip {
+
 	String cep;
 	String logradouro;
 	String complemento;

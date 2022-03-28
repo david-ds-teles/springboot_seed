@@ -6,32 +6,33 @@ import com.david.ds.teles.springboot.seed.utils.exceptions.MyExceptionError;
 import com.david.ds.teles.springboot.seed.utils.i18n.AppMessage;
 import com.david.ds.teles.springboot.seed.utils.logging.DefaultLogging.LogOperation;
 import com.david.ds.teles.springboot.seed.utils.validator.MyValidatorGroups;
+import java.util.List;
 import java.util.Set;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @LogOperation
+@RequiredArgsConstructor
 public class AccountService {
-	private AccountDAO dao;
 
-	private Validator validator;
+	private final AccountDAO dao;
 
-	private AppMessage messages;
+	private final Validator validator;
 
-	@Autowired
-	public AccountService(AccountDAO dao, Validator validator, AppMessage messages) {
-		this.dao = dao;
-		this.validator = validator;
-		this.messages = messages;
-	}
+	private final AppMessage messages;
 
+	@Transactional
 	public Account create(Account account) {
-		account.create(messages);
+		if (account == null) throw new MyExceptionError(
+			messages.getMessage("invalid_params")
+		);
+
+		account.checkCreateParams();
 
 		Set<ConstraintViolation<Account>> violations = validator.validate(
 			account,
@@ -47,7 +48,17 @@ public class AccountService {
 
 	@Transactional
 	public Account update(Account account) {
-		account.update(messages);
+		account.checkUpdateParams();
+
+		boolean isExists = dao.existsById(account.getId());
+
+		if (!isExists) {
+			int httpStatus = 404;
+			throw new MyExceptionError(
+				messages.getMessage("not_found", new Object[] { "account", account.getId() }),
+				httpStatus
+			);
+		}
 
 		Account toUpdate = dao.getById(account.getId());
 		toUpdate.setProvider(account.getProvider());
@@ -66,9 +77,42 @@ public class AccountService {
 
 	@Transactional
 	public Account fetch(Long id) {
-		if (id == null || id <= 0) throw new MyExceptionError(messages.getMessage("invalid_params"));
+		Account account = new Account(id);
+		account.checkIdValidty();
 
-		Account account = dao.getById(id);
+		account = dao.getById(id);
+
+		if (account == null) {
+			int httpStatus = 404;
+			throw new MyExceptionError(
+				messages.getMessage("not_found", new Object[] { "account", id }),
+				httpStatus
+			);
+		}
+
 		return account;
+	}
+
+	@Transactional
+	public List<Account> fetchAll() {
+		List<Account> result = dao.findAll();
+		return result;
+	}
+
+	@Transactional
+	public void delete(Long id) {
+		Account account = new Account(id);
+		account.checkIdValidty();
+		boolean isExists = dao.existsById(id);
+
+		if (isExists) {
+			dao.delete(account);
+		} else {
+			int httpStatus = 404;
+			throw new MyExceptionError(
+				messages.getMessage("not_found", new Object[] { "account", id }),
+				httpStatus
+			);
+		}
 	}
 }

@@ -1,0 +1,13 @@
+spring:
+    
+  messages:
+    encoding: UTF-8
+    basename: lang/messages
+    
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: seed
+    url: jdbc:mysql://localhost:3306/spring
+  jpa:
+    show-sql: 'true'

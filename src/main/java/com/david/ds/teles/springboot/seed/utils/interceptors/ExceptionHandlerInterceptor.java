@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -22,13 +23,16 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler {
+
 	private Logger log = LoggerFactory.getLogger(ExceptionHandlerInterceptor.class);
 
 	@Autowired
 	private AppMessage messages;
 
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+	public ResponseEntity<ErrorResponse> handleConstraintViolation(
+		ConstraintViolationException ex
+	) {
 		log.error("default handleConstraintViolation error handler", ex);
 
 		List<String> errors = new ArrayList<>();
@@ -43,15 +47,19 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 			messages.getMessage("invalid_request"),
 			errors
 		);
-		return ResponseEntity.internalServerError().body(rsp);
+		return ResponseEntity.badRequest().body(rsp);
 	}
 
 	@ExceptionHandler(MyExceptionError.class)
 	public ResponseEntity<ErrorResponse> myExceptionHandler(MyExceptionError ex) {
-		log.error("default throwable error handler", ex);
+		log.info("default throwable error handler");
 
-		ErrorResponse rsp = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(rsp);
+		String message = extractMessageKeyValue(ex);
+
+		log.error(message, ex);
+
+		ErrorResponse rsp = new ErrorResponse(ex.getStatus(), message);
+		return ResponseEntity.status(ex.getStatus()).body(rsp);
 	}
 
 	@ExceptionHandler(Throwable.class)
@@ -62,7 +70,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 			HttpStatus.INTERNAL_SERVER_ERROR.value(),
 			messages.getMessage("internal_server_error")
 		);
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(rsp);
+		return ResponseEntity.internalServerError().body(rsp);
 	}
 
 	@Override
@@ -78,7 +86,25 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 			HttpStatus.BAD_REQUEST.value(),
 			messages.getMessage("body_not_provided")
 		);
-		return ResponseEntity.internalServerError().body(rsp);
+
+		return ResponseEntity.badRequest().body(rsp);
+	}
+
+	@Override
+	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+		HttpRequestMethodNotSupportedException ex,
+		HttpHeaders headers,
+		HttpStatus status,
+		WebRequest request
+	) {
+		log.error("default handleHttpRequestMethodNotSupported handler", ex);
+
+		ErrorResponse rsp = new ErrorResponse(
+			HttpStatus.BAD_REQUEST.value(),
+			messages.getMessage("http_method_not_supported")
+		);
+
+		return ResponseEntity.badRequest().body(rsp);
 	}
 
 	@Override
@@ -98,8 +124,19 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 		return ResponseEntity.internalServerError().body(rsp);
 	}
 
+	private String extractMessageKeyValue(MyExceptionError ex) {
+		String message = ex.getMessage();
+
+		if (ex.getMessageKey() != null) {
+			message = messages.getMessage(ex.getMessageKey(), ex.getMessageArgs());
+		}
+
+		return message;
+	}
+
 	@JsonInclude(Include.NON_NULL)
 	static class ErrorResponse {
+
 		public int status;
 		public String message;
 		public List<String> errors;

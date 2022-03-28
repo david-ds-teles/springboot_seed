@@ -13,6 +13,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Component
 public class HttpLanguageInterceptor implements HandlerInterceptor {
+
 	@Autowired
 	private AppMessage appMessage;
 
@@ -23,8 +24,7 @@ public class HttpLanguageInterceptor implements HandlerInterceptor {
 		HttpServletRequest request,
 		HttpServletResponse response,
 		Object handler
-	)
-		throws Exception {
+	) throws Exception {
 		String lang = request.getHeader("accept-language");
 		Locale locale = Locale.getDefault();
 

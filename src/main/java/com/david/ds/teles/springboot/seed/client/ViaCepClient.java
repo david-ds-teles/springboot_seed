@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class ViaCepClient implements ZipService {
+
 	private final WebClient webClient;
 
 	public ViaCepClient(
@@ -17,7 +18,8 @@ public class ViaCepClient implements ZipService {
 	}
 
 	public Zip fetch(String zip) {
-		Mono<Zip> mono = this.webClient.get().uri("/{cep}/json/", zip).retrieve().bodyToMono(Zip.class);
+		Mono<Zip> mono =
+			this.webClient.get().uri("/{cep}/json/", zip).retrieve().bodyToMono(Zip.class);
 		return mono.block();
 	}
 }
