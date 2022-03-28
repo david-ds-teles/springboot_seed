@@ -26,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(OrderAnnotation.class)
 class AccountAPITest {
+
 	ObjectMapper objectMapper = new ObjectMapper();
 
 	@Autowired
@@ -59,11 +60,15 @@ class AccountAPITest {
 	}
 
 	@Test
-	void should_give_an_error_when_provide_invalid_value() throws JsonProcessingException {
+	void should_give_an_error_when_provide_invalid_email_provide()
+		throws JsonProcessingException {
 		Account givenAccount = new Account();
 		givenAccount.setEmail("david.ds.teles@foo.com");
 
-		String message = messages.getMessage("invalid_email", new Object[] { givenAccount.getEmail() });
+		String message = messages.getMessage(
+			"invalid_email",
+			new Object[] { givenAccount.getEmail() }
+		);
 		ObjectNode root = objectMapper.createObjectNode();
 		root.put("status", 400);
 		root.put("message", message);
@@ -122,7 +127,7 @@ class AccountAPITest {
 	}
 
 	@Test
-	void should_give_an_error_when_not_provide_body() throws JsonProcessingException {
+	void should_give_an_error_when_not_provide_a_body() throws JsonProcessingException {
 		AccountDTO givenDto = genAccountDTO();
 		givenDto.setProvider("google");
 
@@ -149,11 +154,14 @@ class AccountAPITest {
 	}
 
 	@Test
-	void should_give_an_error_when_id_not_exist() throws JsonProcessingException {
+	void should_give_an_404_when_id_not_exist() throws JsonProcessingException {
 		Long givenId = 100l;
-		String message = messages.getMessage("not_found", new Object[] { "account", givenId });
+		String message = messages.getMessage(
+			"not_found",
+			new Object[] { "account", givenId }
+		);
 		ObjectNode root = objectMapper.createObjectNode();
-		root.put("status", 400);
+		root.put("status", 404);
 		root.put("message", message);
 
 		String expectedResult = objectMapper.writeValueAsString(root);
@@ -163,7 +171,7 @@ class AccountAPITest {
 			.uri("/account/" + givenId)
 			.exchange()
 			.expectStatus()
-			.isBadRequest()
+			.isNotFound()
 			.expectBody(String.class)
 			.isEqualTo(expectedResult);
 	}

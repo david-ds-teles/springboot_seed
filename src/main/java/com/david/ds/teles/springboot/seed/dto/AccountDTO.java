@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class AccountDTO implements EntityConverter<Account> {
+
 	private Long id;
 
 	private String email;

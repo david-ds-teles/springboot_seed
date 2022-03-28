@@ -1,5 +1,9 @@
-test.prop: test-from-test
 spring:
+    
+  messages:
+    encoding: UTF-8
+    basename: lang/messages
+    
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root

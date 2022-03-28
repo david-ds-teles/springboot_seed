@@ -16,9 +16,12 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class DefaultLogging {
+
 	private Logger log = LoggerFactory.getLogger(DefaultLogging.class);
 
-	@Around("within(@DefaultLogging.LogOperation *) || @annotation(DefaultLogging.LogOperation)")
+	@Around(
+		"within(@DefaultLogging.LogOperation *) || @annotation(DefaultLogging.LogOperation)"
+	)
 	public Object log(ProceedingJoinPoint point) throws Throwable {
 		log.info("starting {}", point.getSignature());
 		Object result = point.proceed();

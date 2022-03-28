@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/account")
 public class AccountAPI {
+
 	@Autowired
 	private AccountService service;
 
@@ -31,7 +32,10 @@ public class AccountAPI {
 	}
 
 	@PutMapping("/{id:[\\d]+}")
-	public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody AccountDTO dto) {
+	public ResponseEntity<Void> update(
+		@PathVariable("id") Long id,
+		@RequestBody AccountDTO dto
+	) {
 		if (dto.getId() == null) dto.setId(id);
 
 		service.update(dto.toEntity());

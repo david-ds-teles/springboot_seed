@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 @LogOperation
 @RequiredArgsConstructor
 public class AccountService {
+
 	private final AccountDAO dao;
 
 	private final Validator validator;
@@ -27,7 +28,9 @@ public class AccountService {
 
 	@Transactional
 	public Account create(Account account) {
-		if (account == null) throw new MyExceptionError(messages.getMessage("invalid_params"));
+		if (account == null) throw new MyExceptionError(
+			messages.getMessage("invalid_params")
+		);
 
 		account.checkCreateParams();
 
@@ -49,9 +52,13 @@ public class AccountService {
 
 		boolean isExists = dao.existsById(account.getId());
 
-		if (!isExists) throw new MyExceptionError(
-			messages.getMessage("not_found", new Object[] { "account", account.getId() })
-		);
+		if (!isExists) {
+			int httpStatus = 404;
+			throw new MyExceptionError(
+				messages.getMessage("not_found", new Object[] { "account", account.getId() }),
+				httpStatus
+			);
+		}
 
 		Account toUpdate = dao.getById(account.getId());
 		toUpdate.setProvider(account.getProvider());
@@ -74,6 +81,15 @@ public class AccountService {
 		account.checkIdValidty();
 
 		account = dao.getById(id);
+
+		if (account == null) {
+			int httpStatus = 404;
+			throw new MyExceptionError(
+				messages.getMessage("not_found", new Object[] { "account", id }),
+				httpStatus
+			);
+		}
+
 		return account;
 	}
 
@@ -89,8 +105,14 @@ public class AccountService {
 		account.checkIdValidty();
 		boolean isExists = dao.existsById(id);
 
-		if (isExists) dao.delete(account); else throw new MyExceptionError(
-			messages.getMessage("not_found", new Object[] { "account", id })
-		);
+		if (isExists) {
+			dao.delete(account);
+		} else {
+			int httpStatus = 404;
+			throw new MyExceptionError(
+				messages.getMessage("not_found", new Object[] { "account", id }),
+				httpStatus
+			);
+		}
 	}
 }

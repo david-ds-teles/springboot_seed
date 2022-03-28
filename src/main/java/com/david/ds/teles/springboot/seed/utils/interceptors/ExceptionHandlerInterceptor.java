@@ -23,13 +23,16 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler {
+
 	private Logger log = LoggerFactory.getLogger(ExceptionHandlerInterceptor.class);
 
 	@Autowired
 	private AppMessage messages;
 
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+	public ResponseEntity<ErrorResponse> handleConstraintViolation(
+		ConstraintViolationException ex
+	) {
 		log.error("default handleConstraintViolation error handler", ex);
 
 		List<String> errors = new ArrayList<>();
@@ -44,7 +47,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 			messages.getMessage("invalid_request"),
 			errors
 		);
-		return ResponseEntity.internalServerError().body(rsp);
+		return ResponseEntity.badRequest().body(rsp);
 	}
 
 	@ExceptionHandler(MyExceptionError.class)
@@ -55,8 +58,8 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 
 		log.error(message, ex);
 
-		ErrorResponse rsp = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(rsp);
+		ErrorResponse rsp = new ErrorResponse(ex.getStatus(), message);
+		return ResponseEntity.status(ex.getStatus()).body(rsp);
 	}
 
 	@ExceptionHandler(Throwable.class)
@@ -67,7 +70,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 			HttpStatus.INTERNAL_SERVER_ERROR.value(),
 			messages.getMessage("internal_server_error")
 		);
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(rsp);
+		return ResponseEntity.internalServerError().body(rsp);
 	}
 
 	@Override
@@ -133,6 +136,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 
 	@JsonInclude(Include.NON_NULL)
 	static class ErrorResponse {
+
 		public int status;
 		public String message;
 		public List<String> errors;

@@ -27,6 +27,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class Account {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

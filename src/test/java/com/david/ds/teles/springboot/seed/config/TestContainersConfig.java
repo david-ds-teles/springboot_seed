@@ -18,6 +18,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
  */
 public class TestContainersConfig
 	implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
 	Logger log = LoggerFactory.getLogger(TestContainersConfig.class);
 
 	/**
