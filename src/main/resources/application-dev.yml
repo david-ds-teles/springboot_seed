@@ -1,8 +1,16 @@
 #main
 spring:
    jpa:
-      show-sql: "true"
+      show-sql: true
 
 #Server
 server:
   port: 8080
+
+#Fancy Service 
+fancy:
+  service.mocked: true
+
+#Bar Service
+bar:
+  service.mocked: true

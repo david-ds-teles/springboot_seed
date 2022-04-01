@@ -11,3 +11,11 @@ spring:
     url: jdbc:mysql://localhost:3306/spring
   jpa:
     show-sql: 'true'
+    
+#Bar Service
+bar:
+  service.mocked: true
+  
+#Fancy Service 
+fancy:
+  service.mocked: true
