@@ -61,6 +61,7 @@ logging:
       
 viacep:
   url: https://viacep.com.br/ws
+
 #Actuator config
 management:
 #   endpoint:
@@ -71,3 +72,30 @@ management:
    endpoints:
       web:
        base-path: /monitor
+
+springdoc:
+  swagger-ui.path: /swagger-ui.html
+  api-docs.path: /api-docs
+  packagesToScan: com.david.ds.teles
+  pathsToMatch: /**
+
+api:
+  common:
+    version: 1.0.0.0
+    title: springboot-seed-api
+    description: A seed springboot project to help to guide you
+    termsOfService: Just give me the credits if you're using it
+    license: MIT
+    licenseUrl: https://github.com/david-ds-teles/springboot_seed/blob/main/LICENSE
+
+    externalDocDesc: Github
+    externalDocUrl: https://github.com/david-ds-teles/springboot_seed#readme
+    contact:
+      name: David Teles
+      url: https://www.linkedin.com/in/david-teles/?locale=en_US
+      email: david.ds.teles@gmail.com
+
+  rsp:
+    ok: everything looks fine
+    badRequest: Bad Request, invalid data or parameters
+    notFound: Not found
