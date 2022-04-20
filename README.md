@@ -23,6 +23,12 @@ You'll find here:
 * multiple profiles to separate environment.
 * prettier.
 
+## Swagger
+To access the open api specification and browser on api docs.
+
+```
+http://{HOST}:{PORT}/swagger-ui/
+```
 ## Prettier
 
 This project has a maven plugin **prettier-maven-plugin** to help keep things neat. 

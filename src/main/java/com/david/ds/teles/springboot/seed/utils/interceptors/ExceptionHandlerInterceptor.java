@@ -18,6 +18,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -30,6 +31,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 	private AppMessage messages;
 
 	@ExceptionHandler(ConstraintViolationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseEntity<ErrorResponse> handleConstraintViolation(
 		ConstraintViolationException ex
 	) {
@@ -51,6 +53,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 	}
 
 	@ExceptionHandler(MyExceptionError.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ResponseEntity<ErrorResponse> myExceptionHandler(MyExceptionError ex) {
 		log.info("default throwable error handler");
 
@@ -63,6 +66,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 	}
 
 	@ExceptionHandler(Throwable.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ResponseEntity<ErrorResponse> handleThrowableException(Throwable ex) {
 		log.error("default throwable error handler", ex);
 
@@ -74,6 +78,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 	}
 
 	@Override
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
 		HttpMessageNotReadableException ex,
 		HttpHeaders headers,
@@ -91,6 +96,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 	}
 
 	@Override
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
 		HttpRequestMethodNotSupportedException ex,
 		HttpHeaders headers,
@@ -108,6 +114,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 	}
 
 	@Override
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected ResponseEntity<Object> handleExceptionInternal(
 		Exception ex,
 		Object body,
@@ -135,7 +142,7 @@ public class ExceptionHandlerInterceptor extends ResponseEntityExceptionHandler 
 	}
 
 	@JsonInclude(Include.NON_NULL)
-	static class ErrorResponse {
+	public static class ErrorResponse {
 
 		public int status;
 		public String message;
